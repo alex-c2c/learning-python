@@ -20,11 +20,11 @@ class LinkedListNode:
 
 
 class LinkedList:
-    def __init__(self, first_node:LinkedListNode|None):
-        self.first_node:LinkedListNode|None = first_node
-        self.last_node:LinkedListNode|None = first_node
+    def __init__(self, head:LinkedListNode|None):
+        self.head:LinkedListNode|None = head
+        self.tail:LinkedListNode|None = head
 
-        if first_node is not None:
+        if head is not None:
             self.node_count:int = 1
         else:
             self.node_count:int = 0
@@ -41,11 +41,11 @@ class LinkedList:
         if index > self.node_count:
             raise IndexError(f"Attempting to get an element at index[{index}] > node_count[{self.node_count}]")
 
-        if self.first_node is None:
+        if self.head is None:
             raise IndexError(f"linklist is empty!")
 
         counter:int = 0
-        node:LinkedListNode|None = self.first_node
+        node:LinkedListNode|None = self.head
 
         while counter < index:
             node = node.next
@@ -67,11 +67,11 @@ class LinkedList:
         if index > self.node_count:
             raise IndexError(f"Attempting to get an element at index[{self.node_count - index - 1}] > node_count[{self.node_count}]")
 
-        if self.last_node is None:
+        if self.tail is None:
             raise IndexError(f"linklist is empty")
 
         counter:int = 0
-        node:LinkedListNode|None = self.last_node
+        node:LinkedListNode|None = self.tail
 
         while counter < index:
             node = node.prev
@@ -86,46 +86,46 @@ class LinkedList:
         return node
 
 
-    def add_value_start(self, new_value) -> None:
+    def add_value_head(self, new_value) -> None:
         new_node:LinkedListNode|None = LinkedListNode(new_value)
-        self.add_node_start(new_node)
+        self.add_node_head(new_node)
 
 
-    def add_node_start(self, new_node:LinkedListNode|None) -> None:
+    def add_node_head(self, new_node:LinkedListNode|None) -> None:
         if new_node is None:
             return
 
-        if self.first_node is None:
-            self.first_node = new_node
-            self.last_node = new_node
+        if self.head is None:
+            self.head = new_node
+            self.tail = new_node
 
         else:
-            next_node = self.first_node
+            next_node = self.head
             new_node.next = next_node
             next_node.prev = new_node
-            self.first_node = new_node
+            self.head = new_node
 
         self.node_count += 1
 
 
-    def add_value_end(self, new_value) -> None:
+    def add_value_tail(self, new_value) -> None:
         new_node:LinkedListNode|None = LinkedListNode(new_value)
-        self.add_node_end(new_node)
+        self.add_node_tail(new_node)
 
 
-    def add_node_end(self, new_node:LinkedListNode|None) -> None:
+    def add_node_tail(self, new_node:LinkedListNode|None) -> None:
         if new_node is None:
             return
 
-        if self.last_node is None:
-            self.first_node = new_node
-            self.last_node = new_node
+        if self.tail is None:
+            self.head = new_node
+            self.tail = new_node
 
         else:
-            prev_node = self.last_node
+            prev_node = self.tail
             prev_node.next = new_node
             new_node.prev = prev_node
-            self.last_node = new_node
+            self.tail = new_node
 
         self.node_count += 1
 
@@ -151,39 +151,64 @@ class LinkedList:
             new_node.next = node_at_index
             node_at_index.prev = new_node
         else:
-            self.first_node = new_node
+            self.head = new_node
             new_node.next = node_at_index
             node_at_index.prev = new_node
 
         self.node_count += 1
 
 
-    def remove_node_first(self) -> None:
-        if self.first_node is None:
+    def insert_value_reverse(self, new_value, index:int) -> None:
+        new_node:LinkedListNode|None = LinkedListNode(new_value)
+        self.insert_node_reverse(new_node, index)
+
+
+    def insert_node_reverse(self, new_node:LinkedListNode|None, index:int) -> None:
+        if new_node is None:
+            return
+
+        node_at_index:LinkedListNode|None = self.get_reverse(index)
+        if node_at_index is None:
+            raise IndexError(f"Unable to get element at reverse index [{index}]")
+
+        next_node:LinkedListNode|None = node_at_index.next
+        if next_node is not None:
+            node_at_index.next = new_node
+            new_node.prev = node_at_index
+            new_node.next = next_node
+            next_node.prev = new_node
+        else:
+            self.tail = new_node
+            new_node.prev = node_at_index
+            node_at_index.next = new_node
+
+
+    def remove_head(self) -> None:
+        if self.head is None:
             raise IndexError(f"Attempting to remove first element from an empty linkedlist")
 
-        next_node:LinkedListNode|None = self.first_node.next
+        next_node:LinkedListNode|None = self.head.next
 
         if next_node is None:
-            self.first_node = None
+            self.head = None
         else:
             next_node.prev = None
-            self.first_node = next_node
+            self.head = next_node
 
         self.node_count -= 1
 
 
-    def remove_node_last(self) -> None:
-        if self.last_node is None:
+    def remove_tail(self) -> None:
+        if self.tail is None:
             raise IndexError(f"Attempting to remove last element from an emtpy linkedlist")
 
-        prev_node:LinkedListNode|None = self.last_node.prev
+        prev_node:LinkedListNode|None = self.tail.prev
 
         if prev_node is None:
-            self.last_node = None
+            self.tail = None
         else:
             prev_node.next = None
-            self.last_node = prev_node
+            self.tail = prev_node
 
         self.node_count -= 1
 
@@ -196,13 +221,13 @@ class LinkedList:
         prev_node:LinkedListNode|None = node.prev
 
         if next_node is None and prev_node is None:
-            self.first_node = None
-            self.last_node = None
+            self.head = None
+            self.tail = None
         elif next_node is None and prev_node is not None:
-            self.last_node = prev_node
+            self.tail = prev_node
             prev_node.next = None
         elif next_node is not None and prev_node is None:
-                self.first_node = next_node
+                self.head = next_node
                 next_node.prev = None
         elif next_node is not None and prev_node is not None:
             next_node.prev = prev_node
@@ -224,14 +249,14 @@ class LinkedList:
     def print_all_elements(self) -> None:
         stack:list[str] = []
 
-        node = self.first_node
+        node = self.head
         counter:int = 0
         while node is not None:
             stack.append(f"{counter}: {str(node.data)}")
             node = node.next
             counter += 1
 
-        print(f"{"\n".join(stack)}")
+        print(f"{"\n".join(stack)}\n--------------")
 
 
     def length(self) -> int:

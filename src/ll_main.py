@@ -21,17 +21,14 @@ def main() -> None:
     ll = LinkedList(None)
 
     for x in range(10):
-        ll.add_value_end(x)
+        ll.add_value_tail(x)
 
-    node = ll.get(2)
-    print(f"{node.data = }")
-
-    node2 = ll.get_reverse(2)
-    print(f"{node2.data = }")
-
-    ll.remove_node_at(0)
     ll.print_all_elements()
 
+    ll.insert_value(100, 2)
+    ll.insert_value_reverse(200, 2)
+
+    ll.print_all_elements()
 
 if __name__ == "__main__":
     main()
